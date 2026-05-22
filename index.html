@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aiai.com</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    height: 100vh;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+
+  .slider {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    transform: translateY(30px);
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  /* Slide 1 - svart med lila glöd och rutnät */
+  .slide-1 {
+    background: #000;
+  }
+  .slide-1 .bg-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .slide-1 .orb {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(120,80,255,0.35) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 5s ease-in-out infinite;
+  }
+
+  /* Slide 2 - mörkgrå med diagonala linjer */
+  .slide-2 {
+    background: #0a0a0a;
+  }
+  .slide-2 .bg-lines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.02) 40px,
+      rgba(255,255,255,0.02) 41px
+    );
+  }
+  .slide-2 .cards {
+    position: absolute; inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 80px;
+  }
+  .slide-2 .card {
+    flex: 1;
+    height: 260px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+  }
+
+  /* Slide 3 - mörkblå med punktmönster */
+  .slide-3 {
+    background: #050510;
+  }
+  .slide-3 .bg-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(100,120,255,0.18) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  .slide-3 .steps-row {
+    position: absolute; inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 80px;
+  }
+  .slide-3 .step-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+  .slide-3 .step-block:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    right: -50%;
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+  .slide-3 .step-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1px solid rgba(124,58,237,0.4);
+    background: rgba(124,58,237,0.08);
+  }
+  .slide-3 .step-line {
+    width: 80%;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* Slide 4 - svart med accent-bar och statistikblock */
+  .slide-4 {
+    background: #000;
+  }
+  .slide-4 .accent-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #06b6d4, #10b981);
+  }
+  .slide-4 .stats {
+    position: absolute; inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 80px;
+  }
+  .slide-4 .stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .slide-4 .stat-bar-big {
+    width: 120px; height: 80px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.15));
+    border: 1px solid rgba(124,58,237,0.25);
+  }
+  .slide-4 .stat-bar-small {
+    width: 80px; height: 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* Slide 5 - mörk med glöd underifrån och pris-kort */
+  .slide-5 {
+    background: #08080f;
+  }
+  .slide-5 .bg-glow {
+    position: absolute;
+    width: 700px; height: 350px;
+    background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 70%);
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+  }
+  .slide-5 .pricing {
+    position: absolute; inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 80px;
+  }
+  .slide-5 .price-card {
+    flex: 1;
+    height: 300px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+  }
+  .slide-5 .price-card.featured {
+    background: rgba(124,58,237,0.12);
+    border-color: rgba(124,58,237,0.4);
+    transform: scaleY(1.04);
+  }
+
+  /* Slide 6 - svart med stor bakgrundstext och CTA-block */
+  .slide-6 {
+    background: #000;
+  }
+  .slide-6 .bg-text {
+    position: absolute;
+    font-size: 220px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.025);
+    letter-spacing: -0.05em;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    user-select: none;
+  }
+  .slide-6 .cta-block {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .slide-6 .cta-line {
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, rgba(124,58,237,0.5), rgba(6,182,212,0.3));
+  }
+  .slide-6 .cta-line-1 { width: 320px; }
+  .slide-6 .cta-line-2 { width: 220px; opacity: 0.5; }
+  .slide-6 .cta-btn {
+    margin-top: 16px;
+    width: 180px; height: 52px;
+    border-radius: 100px;
+    background: rgba(124,58,237,0.6);
+    border: 1px solid rgba(124,58,237,0.8);
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 20px;
+    border-radius: 100px;
+  }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+  }
+
+  .nav-dot.active {
+    background: #7c3aed;
+    width: 20px;
+    border-radius: 3px;
+  }
+
+  .nav-arrow {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav-arrow:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  .slide-num {
+    position: fixed;
+    top: 32px; right: 40px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    z-index: 100;
+    letter-spacing: 0.1em;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="slide-num" id="slideNum">01 / 06</div>
+
+<div class="slider">
+
+  <!-- Slide 1 -->
+  <div class="slide slide-1 active">
+    <div class="bg-grid"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide slide-2">
+    <div class="bg-lines"></div>
+    <div class="cards">
+      <div class="card"></div>
+      <div class="card"></div>
+      <div class="card"></div>
+    </div>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide slide-3">
+    <div class="bg-dots"></div>
+    <div class="steps-row">
+      <div class="step-block">
+        <div class="step-circle"></div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-block">
+        <div class="step-circle"></div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-block">
+        <div class="step-circle"></div>
+        <div class="step-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide slide-4">
+    <div class="accent-bar"></div>
+    <div class="stats">
+      <div class="stat-block">
+        <div class="stat-bar-big"></div>
+        <div class="stat-bar-small"></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-bar-big" style="background: linear-gradient(135deg, rgba(6,182,212,0.3), rgba(16,185,129,0.15)); border-color: rgba(6,182,212,0.25);"></div>
+        <div class="stat-bar-small"></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-bar-big" style="background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(124,58,237,0.15)); border-color: rgba(16,185,129,0.25);"></div>
+        <div class="stat-bar-small"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5 -->
+  <div class="slide slide-5">
+    <div class="bg-glow"></div>
+    <div class="pricing">
+      <div class="price-card"></div>
+      <div class="price-card featured"></div>
+      <div class="price-card"></div>
+    </div>
+  </div>
+
+  <!-- Slide 6 -->
+  <div class="slide slide-6">
+    <div class="bg-text">AIAI</div>
+    <div class="cta-block">
+      <div class="cta-line cta-line-1"></div>
+      <div class="cta-line cta-line-2"></div>
+      <div class="cta-btn"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button class="nav-arrow" id="prevBtn">←</button>
+  <button class="nav-dot active" data-index="0"></button>
+  <button class="nav-dot" data-index="1"></button>
+  <button class="nav-dot" data-index="2"></button>
+  <button class="nav-dot" data-index="3"></button>
+  <button class="nav-dot" data-index="4"></button>
+  <button class="nav-dot" data-index="5"></button>
+  <button class="nav-arrow" id="nextBtn">→</button>
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.nav-dot');
+  const slideNum = document.getElementById('slideNum');
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    slideNum.textContent = String(current + 1).padStart(2, '0') + ' / 06';
+  }
+
+  document.getElementById('nextBtn').onclick = () => goTo(current + 1);
+  document.getElementById('prevBtn').onclick = () => goTo(current - 1);
+  dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.index)));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+  });
+
+  let startX = 0;
+  document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
+  });
+</script>
+</body>
+</html>
